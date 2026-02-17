@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <PackageId>QuestMail</PackageId>
+        <Version>0.0.1</Version>
+        <Authors>Erikson Melgarejo</Authors>
+        <Description>The easy way to send beautiful emails.</Description>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <Title>QuestMail</Title>
+    </PropertyGroup>
+</Project>
