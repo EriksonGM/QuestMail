@@ -1,0 +1,36 @@
+name: Publish NuGet Package
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore ./src/QuestMail.Core/QuestMail.Core.csproj
+
+      - name: Build
+        run: dotnet build ./src/QuestMail.Core/QuestMail.Core.csproj --configuration Release --no-restore
+
+      - name: Pack
+        run: dotnet pack ./src/QuestMail.Core/QuestMail.Core.csproj --configuration Release --no-build --output ./artifacts
+
+      - name: Publish to NuGet
+        run: dotnet nuget push ./artifacts/*.nupkg \
+              --api-key ${{ secrets.NUGET_API_KEY }} \
+              --source https://api.nuget.org/v3/index.json \
+              --skip-duplicate
