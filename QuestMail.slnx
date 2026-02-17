@@ -1,1 +1,4 @@
-<Solution />
+<Solution>
+  <Project Path="src/QuestMail.Core/QuestMail.Core.csproj" />
+  <Project Path="src/QuestMail.Shared/QuestMail.Shared.csproj" />
+</Solution>

@@ -8,5 +8,10 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <Title>QuestMail</Title>
+        <PackageProjectUrl>https://github.com/EriksonGM/QuestMail</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/EriksonGM/QuestMail</RepositoryUrl>
     </PropertyGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\QuestMail.Shared\QuestMail.Shared.csproj" />
+    </ItemGroup>
 </Project>
