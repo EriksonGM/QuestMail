@@ -6,7 +6,7 @@
         <Description>The easy way to send beautiful emails.</Description>
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
+        <Nullable>disable</Nullable>
         <Title>QuestMail</Title>
         <PackageProjectUrl>https://github.com/EriksonGM/QuestMail</PackageProjectUrl>
         <RepositoryUrl>https://github.com/EriksonGM/QuestMail</RepositoryUrl>
