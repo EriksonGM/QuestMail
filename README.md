@@ -1,41 +1,192 @@
 # QuestMail
 
-QuestMail is a C# library designed to make building and sending beautiful email templates easy and intuitive.
+QuestMail is a C# library for building HTML and plain-text email content with a fluent, strongly typed API.
 
 **Status:** Early Development
 
 ## Overview
 
-QuestMail aims to simplify the process of creating email templates in C#. Instead of wrestling with raw HTML strings or complex template engines, QuestMail provides a fluent and type-safe way to define your email content.
+Compose a tree of reusable email components in C#, then pass the generated bodies to your email provider. QuestMail builds content; it does not send messages or manage SMTP connections.
 
-## Features (Planned)
+## Features
 
-- **Fluent API:** Build emails using C# code with a fluent interface.
-- **Component-Based:** Create reusable email components.
-- **Strongly Typed:** Catch errors at compile time, not runtime.
-- **Beautiful Defaults:** Comes with a set of modern, responsive email templates.
-- **Easy Integration:** Designed to integrate easily with popular email senders.
+- Body, Frame, Row, Heading H1–H3, Paragraph, Button, Link, Divider, Spacer and Image components.
+- Structured, reusable component trees with defensive, read-only child collections.
+- Typed dimensions, spacing, borders, alignment and typography; reusable style records.
+- Inline desktop styles, presentation tables, Outlook maximum-width fallbacks and mobile overrides at 480px.
+- Plain text generated alongside HTML, including link destinations and image alternative text.
+- Encoded text/attributes, URL scheme validation and constrained CSS values.
+- Immutable output snapshots, independent of subsequent builder changes.
+- One NuGet package (`QuestMail`) without internal package dependencies.
+
+Dynamic variables, conditions, repetition, custom HTML, compound catalog blocks, a visual editor, JSON persistence and provider integrations are not implemented. Builder instances are mutable and should not be shared between concurrent operations.
 
 ## Getting Started
 
 ### Prerequisites
 
-- .NET SDK (Project targets `net10.0` - ensure you have the appropriate preview or update the `TargetFramework` in `.csproj` if needed).
+- .NET 10 SDK. `global.json` allows stable .NET 10 feature-band and patch updates.
 
 ### Installation
 
-*Instructions for installing the package will be added here once published.*
+Once the desired release has been published to NuGet:
+
+```sh
+dotnet add package QuestMail --version <published-version>
+```
+
+Until then, build from source and use a project reference or the locally generated NuGet package.
 
 ### Usage
 
-*Examples of how to use the library will be added as features are implemented.*
+```csharp
+using QuestMail.Core;
+using QuestMail.Core.Components;
+using QuestMail.Core.Enums;
+
+var email = new EmailBuilder()
+    .AddH1("Welcome!", ElementAlignEnum.Center)
+    .AddParagraph("Hello, Ada & team.")
+    .AddH2("Next steps")
+    .AddLine("Confirm your account.\nStart exploring.")
+    .Build();
+
+string htmlBody = email.Html;
+string plainTextBody = email.Plain;
+// Pass these strings to your email provider as the two alternative bodies.
+```
+
+All text is treated as content, never raw HTML. For example, `<script>` becomes `&lt;script&gt;` in HTML and remains literal text in the plain-text body. CRLF, LF and CR input line endings become `<br />` in HTML and platform line endings in plain text. Text blocks add a trailing plain-text newline.
+
+`AddLine` defaults to `LineSizeEnum.Body` and left alignment. Available sizes are `Body`, `Heading1`, `Heading2` and `Heading3`; alignments are `Left`, `Center` and `Right`. Null inputs and undefined enum values throw before adding content. Empty text is allowed.
+
+Components can be reused without sharing builder state:
+
+```csharp
+var footer = new Line("Thanks for reading!", align: ElementAlignEnum.Center);
+var firstEmail = new EmailBuilder().AddH1("First email").Add(footer).Build();
+var secondEmail = new EmailBuilder().AddH1("Second email").Add(footer).Build();
+```
+
+### Component engine
+
+Use `new EmailBuilder(body)` for root configuration and `.Add(component)` for any non-root component. `Body` cannot be nested. The builder appends to its own child list without modifying the original body. Existing `Line`/`AddLine` calls remain supported, while the heading and paragraph shortcuts now use their dedicated components.
+
+```csharp
+using QuestMail.Core;
+using QuestMail.Core.Components;
+using QuestMail.Core.Enums;
+using QuestMail.Core.Styles;
+
+var cardStyle = new ComponentStyle
+{
+    BackgroundColor = "#f8fafc",
+    Padding = new Spacing(24),
+    Border = new EmailBorder(1, "#e2e8f0"),
+    BorderRadius = 8
+};
+
+var body = new Body(
+    new Heading("Welcome, Ada!"),
+    new Row(
+        new Frame(
+            new Image("https://example.com/banner.png", "Account overview")
+            {
+                Style = new ComponentStyle { Width = EmailWidth.Percent(100) }
+            }) { Style = cardStyle },
+        new Frame(
+            new Heading("Get started", HeadingLevelEnum.H2),
+            new Paragraph("Your account is ready."),
+            new Button("Open account", "https://example.com/account"))
+        { Style = cardStyle })
+    {
+        Gap = 16,
+        MobileColumns = 1 // Set to 2 for a two-column mobile grid.
+    },
+    new Spacer(24) { MobileStyle = new ComponentStyle { Height = 12 } },
+    new Divider(),
+    new Link("Terms and conditions", "https://example.com/terms"))
+{
+    Language = "en",
+    CanvasColor = "#f3f4f6",
+    Style = new ComponentStyle { Width = EmailWidth.Max(640), Padding = new Spacing(32) },
+    MobileStyle = new ComponentStyle { Padding = new Spacing(16) }
+};
+
+var email = new EmailBuilder(body).Build();
+```
+
+| Component | Content and behavior |
+| --- | --- |
+| `Body` | Root children, `Language`, `CanvasColor`. Default centered white content, maximum 600px, padding 24px. |
+| `Frame` | Vertical grouping of child components. |
+| `Row` | Horizontal table columns, `Gap`, `MobileColumns` (default 1). Child `Style.Width` sets desktop column width; unspecified columns share remaining space. The child fills its allocated column rather than applying the percentage twice. |
+| `Heading` | Text or `IEnumerable<TextRun>`; `HeadingLevelEnum.H1`, `H2` or `H3`. Default font sizes 32, 24 and 20px. |
+| `Paragraph` | Text or `IEnumerable<TextRun>`, inheriting document/container typography. |
+| `Button` | Text, URL, optional `Title` and `OpenInNewWindow`. Styled anchor in a table, blue/white by default, with 12px/24px padding. |
+| `Link` | Text, URL, optional `Title` and `OpenInNewWindow`. Blue and underlined by default. |
+| `Image` | Source URL, required alt text (empty for decorative images), optional `Height` and `LinkUrl`. Height is automatic unless explicitly supplied. |
+| `Divider` | Color, thickness and solid/dashed/dotted/double line style. |
+| `Spacer` | Non-negative height in pixels, with optional responsive height overrides. |
+
+All components expose `Style` and `MobileStyle`. Style records support `with` expressions for reusable variants:
+
+| Property | Values |
+| --- | --- |
+| `Width` | `EmailWidth.Auto`, `.Fixed(pixels)`, `.Max(pixels)`, `.Percent(value)` where `0 < value <= 100`. Max mode fills available width up to its cap. |
+| `MaxWidth`, `Height` | Optional pixel dimensions; image/spacer height can also be overridden on mobile. |
+| `Margin`, `Padding` | `new Spacing(all)`, `(vertical, horizontal)` or `(top, right, bottom, left)`. Margins are implemented as exterior table-cell padding for email compatibility. |
+| `BackgroundColor`, `Border`, `BorderRadius` | Hex/named CSS colors, `new EmailBorder(thickness, color, style)` and pixel radius. A zero-width border removes a border in a mobile override. |
+| `HorizontalAlignment`, `VerticalAlignment` | Left/Center/Right for block positioning; Top/Middle/Bottom for content/columns. Text alignment is a separate typography property. |
+| `Typography` | `TypographyStyle` with font family, pixel size, weight, color, unitless line height, letter spacing, text alignment, italic, decoration, white space and word wrapping. |
+| `Visible` | `false` hides a component; set `Style.Visible = false` and `MobileStyle.Visible = true` for mobile-only content. |
+
+Mobile styles override only supplied properties at widths of 480px or less. Typography inherits through containers, including mobile overrides, while explicit local values win. Widths, padding and other box properties do not inherit. A hidden parent cannot be made visible by its children. Plain text includes blocks visible on either device, in tree order; blocks hidden on both are omitted. Links include destinations, non-decorative images include alt text, dividers become `---`, and positive-height spacers add a blank line.
+
+Rich text uses encoded fragments rather than raw HTML:
+
+```csharp
+var paragraph = new Paragraph(new[]
+{
+    new TextRun("Hello, "),
+    new TextRun("Ada") { Typography = new TypographyStyle { FontWeight = 700, Italic = true } },
+    new TextRun(". Read the guide") { Url = "https://example.com/guide" }
+});
+```
+
+Validation rejects null children/text, undefined enums, non-finite or invalid dimensions, unsafe URL schemes, CSS delimiters in font families/colors and trees deeper than 64 levels. Links accept absolute HTTP/HTTPS, `mailto:` and `tel:` URLs; images accept HTTP/HTTPS and `cid:` URLs. Assets are not downloaded or embedded. Dynamic provider syntax and raw HTML are not interpreted.
+
+**Client compatibility:** the renderer uses table layouts and inline defaults rather than flexbox or grid. Mobile overrides require media-query support. Outlook for Windows may ignore rounded corners, anchor padding, white-space rules or other CSS; maximum-width conditional tables provide a fallback, not a guarantee of identical rendering. Test final templates in the email clients you support. No cross-client certification or VML-based rounded buttons is provided.
+
+### Build, test and run
+
+```sh
+dotnet restore QuestMail.slnx
+dotnet build QuestMail.slnx --configuration Release --no-restore
+dotnet test --solution QuestMail.slnx --configuration Release --no-build --no-restore
+dotnet run --project src/QuestMail.Terminal --configuration Release --no-build
+dotnet pack src/QuestMail.Core/QuestMail.Core.csproj --configuration Release --no-build --no-restore --output artifacts
+```
+
+The terminal example demonstrates all ten components. Pass `-- --html` to print only the HTML document for preview/export.
 
 ## Project Structure
 
 The solution contains the following projects:
 
 - **QuestMail.Core**: The core library containing the main logic for building emails.
-- **QuestMail.Shared**: Shared components and templates.
+- **QuestMail.Terminal**: Runnable example that prints HTML and plain text.
+- **QuestMail.Core.Tests**: Automated component, responsive CSS, encoding, validation and builder-state tests.
+
+The previously empty Shared project has been consolidated into Core to avoid a separate package dependency.
+
+## CI and releases
+
+- Pull requests and pushes to `master` restore, build and test the entire solution on .NET 10, then produce a NuGet artifact.
+- Branch/PR builds use a `0.0.1-ci.<run-number>` version and never publish to NuGet.
+- To release, push a stable version tag such as `v0.1.0`. The tag sets the package version, and NuGet publication happens only after validation succeeds.
+- Configure the repository secret `NUGET_API_KEY` with permission to publish `QuestMail`. Duplicate versions fail rather than silently skipping a release.
+- The local development version in the project remains `0.0.1`; release tags override it consistently during build and pack.
 
 ## Contributing
 
@@ -43,4 +194,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-[Add License Information Here]
+No license has been selected yet. A license must be chosen before distributing this project for general reuse.
