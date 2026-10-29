@@ -2,6 +2,13 @@
 
 All project documentation and release notes are maintained in English.
 
+## Unreleased
+
+### Changed
+
+- Release authentication now uses NuGet Trusted Publishing and GitHub OIDC instead of a long-lived repository API key.
+- Manual release recovery can validate and publish an existing stable tag using the workflow on `master`, without rewriting the tag.
+
 ## [0.1.0] - 2026-10-29
 
 QuestMail 0.1.0 introduces a reusable email component engine and fluent composition for .NET 10, with HTML and plain-text output from the same component tree.

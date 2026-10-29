@@ -253,7 +253,8 @@ Core namespaces:
 - Pull requests and pushes to `master` restore, build and test the entire solution on .NET 10, then produce a NuGet artifact.
 - Branch/PR builds use a `0.1.0-ci.<run-number>` version and never publish to NuGet.
 - To release, push a stable version tag such as `v0.1.0`. The tag sets the package version, and NuGet publication happens only after validation succeeds.
-- Configure the repository secret `NUGET_API_KEY` with permission to publish `QuestMail`. Duplicate versions fail rather than silently skipping a release.
+- Publishing uses [NuGet Trusted Publishing](https://github.com/EriksonGM/QuestMail/blob/master/docs/trusted-publishing.md) and GitHub OIDC. Configure the NuGet trust policy for `EriksonGM/QuestMail` and workflow file `publish.yml`; no long-lived `NUGET_API_KEY` repository secret is required.
+- To recover a release created before an authentication change, run **Build, Test and Publish** manually from `master` and supply the existing tag. The workflow checks out, validates and packages that tag without moving it. Duplicate NuGet versions fail rather than silently skipping a release.
 - The project version is `0.1.0`; release tags override it consistently during build and pack.
 - Project documentation, changelog entries, release notes and release messages are maintained in English.
 
