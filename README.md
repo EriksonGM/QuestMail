@@ -260,4 +260,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-No license has been selected yet. A license must be chosen before distributing this project for general reuse.
+This project is licensed under the [MIT License](LICENSE).

@@ -11,8 +11,10 @@
         <PackageProjectUrl>https://github.com/EriksonGM/QuestMail</PackageProjectUrl>
         <RepositoryUrl>https://github.com/EriksonGM/QuestMail</RepositoryUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
     </PropertyGroup>
     <ItemGroup>
         <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+        <None Include="..\..\LICENSE" Pack="true" PackagePath="\" />
     </ItemGroup>
 </Project>
