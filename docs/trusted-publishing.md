@@ -4,7 +4,7 @@ QuestMail publishes packages through GitHub Actions using NuGet Trusted Publishi
 
 ## One-time NuGet configuration
 
-Sign in to nuget.org as the package owner, **EriksonG**, and open **Trusted Publishing** from the account menu. Create a GitHub trust policy with these exact values:
+Sign in to nuget.org as **EriksonG**, the NuGet profile expected to create the policy, and open **Trusted Publishing** from the account menu. This account must be authorized to publish `QuestMail`. Create a GitHub trust policy with these exact values:
 
 | Field | Value |
 | --- | --- |
@@ -15,7 +15,7 @@ Sign in to nuget.org as the package owner, **EriksonG**, and open **Trusted Publ
 
 Enter only the workflow file name, not `.github/workflows/publish.yml`. The current publish job does not use a GitHub environment, so setting an environment in the policy would prevent the identity from matching.
 
-The policy must permit publishing versions of the `QuestMail` package. The workflow uses the NuGet profile name `EriksonG`, not the GitHub login or an email address. If package ownership changes, update the `user` input of `NuGet/login` and the corresponding NuGet trust policy together.
+The policy must permit publishing versions of the `QuestMail` package. The `user` input of `NuGet/login` must be the NuGet profile that **created the policy**, not the GitHub login, an email address or a package-owning organization name. The current workflow expects the creator to be `EriksonG`. If a different NuGet profile created your policy, update `user` to that profile and verify its permission to publish `QuestMail`.
 
 This configuration must be created on nuget.org by an authorized account owner. A GitHub repository secret cannot replace a NuGet trust policy. The old API-key secret is not used by this workflow; it can be removed after the migration is verified.
 
@@ -60,6 +60,7 @@ This is intended for a package version that has not been published yet. If the v
 ## Troubleshooting
 
 - **OIDC login denied:** verify the NuGet user, repository owner, repository name, workflow file name and optional environment. The workflow must match an active NuGet trust policy.
+- **No matching trust policy owned by user:** create the matching policy under the profile specified by `NuGet/login` or change `user` to the policy creator's NuGet profile. Updating an API-key secret does not fix a missing trust policy.
 - **Missing OIDC token permission:** ensure `id-token: write` is set on the publish job.
 - **Old API-key error after migration:** use the manual recovery flow from `master`; retrying an old tagged workflow still runs the old authentication steps.
 - **Duplicate package version:** choose a new release version. The workflow deliberately does not use `--skip-duplicate`.
