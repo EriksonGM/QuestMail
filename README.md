@@ -4,6 +4,8 @@ QuestMail is a C# library for building HTML and plain-text email content with a 
 
 **Status:** Early Development
 
+**Current release:** [0.1.0](https://github.com/EriksonGM/QuestMail/releases/tag/v0.1.0) · .NET 10 · MIT
+
 ## Overview
 
 Compose a tree of reusable email components in C#, then pass the generated bodies to your email provider. QuestMail builds content; it does not send messages or manage SMTP connections.
@@ -30,13 +32,13 @@ Dynamic variables, conditions, repetition, custom HTML, compound catalog blocks,
 
 ### Installation
 
-Once the desired release has been published to NuGet:
+Install QuestMail 0.1.0 from NuGet:
 
 ```sh
-dotnet add package QuestMail --version <published-version>
+dotnet add package QuestMail --version 0.1.0
 ```
 
-Until then, build from source and use a project reference or the locally generated NuGet package.
+Alternatively, build from source and use a project reference or a locally generated NuGet package. See the [changelog and migration notes](https://github.com/EriksonGM/QuestMail/blob/master/CHANGELOG.md) for the changes included in this release.
 
 ### Usage
 
@@ -249,10 +251,11 @@ Core namespaces:
 ## CI and releases
 
 - Pull requests and pushes to `master` restore, build and test the entire solution on .NET 10, then produce a NuGet artifact.
-- Branch/PR builds use a `0.0.1-ci.<run-number>` version and never publish to NuGet.
+- Branch/PR builds use a `0.1.0-ci.<run-number>` version and never publish to NuGet.
 - To release, push a stable version tag such as `v0.1.0`. The tag sets the package version, and NuGet publication happens only after validation succeeds.
 - Configure the repository secret `NUGET_API_KEY` with permission to publish `QuestMail`. Duplicate versions fail rather than silently skipping a release.
-- The local development version in the project remains `0.0.1`; release tags override it consistently during build and pack.
+- The project version is `0.1.0`; release tags override it consistently during build and pack.
+- Project documentation, changelog entries, release notes and release messages are maintained in English.
 
 ## Contributing
 
@@ -260,4 +263,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](https://github.com/EriksonGM/QuestMail/blob/master/LICENSE).

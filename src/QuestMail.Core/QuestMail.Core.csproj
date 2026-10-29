@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <PackageId>QuestMail</PackageId>
-        <Version>0.0.1</Version>
+        <Version>0.1.0</Version>
         <Authors>Erikson Melgarejo</Authors>
         <Description>Build HTML and plain-text email content with a fluent C# API.</Description>
         <TargetFramework>net10.0</TargetFramework>
@@ -12,6 +12,7 @@
         <RepositoryUrl>https://github.com/EriksonGM/QuestMail</RepositoryUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReleaseNotes>Adds a responsive email component engine and fluent composition, HTML and plain-text rendering, validation, documentation, and MIT licensing. Release notes: https://github.com/EriksonGM/QuestMail/releases/tag/v0.1.0</PackageReleaseNotes>
     </PropertyGroup>
     <ItemGroup>
         <None Include="..\..\README.md" Pack="true" PackagePath="\" />

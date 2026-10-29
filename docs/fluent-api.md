@@ -1,5 +1,7 @@
 # Fluent API guide
 
+This guide covers QuestMail 0.1.0 and requires .NET 10. See the [changelog](../CHANGELOG.md) for release highlights and migration notes.
+
 QuestMail supports both constructor-based composition and fluent composition. Both build the same component tree and use the same HTML/plain-text renderer. The Fluent API does not introduce a second template format or send messages.
 
 ## Getting started
