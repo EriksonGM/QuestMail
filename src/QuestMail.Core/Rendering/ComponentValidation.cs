@@ -55,7 +55,7 @@ internal static partial class ComponentValidation
                 Validate(child, depth + 1);
     }
 
-    private static void ValidateStyle(ComponentStyle style)
+    internal static void ValidateStyle(ComponentStyle style)
     {
         if (style.MaxWidth is { } maxWidth)
             Guard.Positive(maxWidth, nameof(style.MaxWidth));
