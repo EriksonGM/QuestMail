@@ -1,5 +1,5 @@
 <Solution>
   <Project Path="src/QuestMail.Core/QuestMail.Core.csproj" />
-  <Project Path="src/QuestMail.Shared/QuestMail.Shared.csproj" />
   <Project Path="src/QuestMail.Terminal/QuestMail.Terminal.csproj" />
+  <Project Path="tests/QuestMail.Core.Tests/QuestMail.Core.Tests.csproj" />
 </Solution>
