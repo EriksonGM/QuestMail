@@ -1,9 +1,10 @@
 ﻿using QuestMail.Core.Components;
+using QuestMail.Core.Fluent;
 using QuestMail.Core.Rendering;
 
 namespace QuestMail.Core;
 
-public class EmailBuilder
+public class EmailBuilder : IComponentComposer<EmailBuilder>
 {
     private readonly Body _body;
     private readonly List<EmailComponent> _components;
