@@ -11,6 +11,7 @@ Compose a tree of reusable email components in C#, then pass the generated bodie
 ## Features
 
 - Body, Frame, Row, Heading H1–H3, Paragraph, Button, Link, Divider, Spacer and Image components.
+- Optional fluent composition on Body/Frame/Row and EmailBuilder, including nested callbacks.
 - Structured, reusable component trees with defensive, read-only child collections.
 - Typed dimensions, spacing, borders, alignment and typography; reusable style records.
 - Inline desktop styles, presentation tables, Outlook maximum-width fallbacks and mobile overrides at 480px.
@@ -67,6 +68,60 @@ var footer = new Line("Thanks for reading!", align: ElementAlignEnum.Center);
 var firstEmail = new EmailBuilder().AddH1("First email").Add(footer).Build();
 var secondEmail = new EmailBuilder().AddH1("Second email").Add(footer).Build();
 ```
+
+### Fluent API
+
+Import `QuestMail.Core.Fluent` to compose containers without constructing each child explicitly:
+
+See the [Fluent API guide](https://github.com/EriksonGM/QuestMail/blob/master/docs/fluent-api.md) for the method reference, callback behavior, immutable reuse and validation rules.
+
+```csharp
+using QuestMail.Core;
+using QuestMail.Core.Components;
+using QuestMail.Core.Enums;
+using QuestMail.Core.Fluent;
+using QuestMail.Core.Styles;
+
+var body = new Body()
+    .WithLanguage("en")
+    .WithStyle(new ComponentStyle { Width = EmailWidth.Max(640), Padding = new Spacing(24) })
+    .WithMobileStyle(new ComponentStyle { Padding = new Spacing(12) })
+    .AddFrame(frame =>
+    {
+        frame.WithStyle(new ComponentStyle { BackgroundColor = "#f8fafc", Padding = new Spacing(16) })
+            .AddHeading("Welcome, Ada!")
+            .AddParagraph("Your account is ready.")
+            .AddRow(row => row.WithGap(16).WithMobileColumns(1)
+                .AddFrame(left => left.AddHeading("Explore", HeadingLevelEnum.H2).AddParagraph("Find your next steps."))
+                .AddFrame(right => right.AddButton("Open account", "https://example.com/account")));
+    })
+    .AddSpacer(24)
+    .AddDivider()
+    .AddLink("Terms and conditions", "https://example.com/terms");
+
+var email = new EmailBuilder(body).Build();
+```
+
+- `AddFrame` and `AddRow` accept callbacks, existing child components, or component arrays. Callbacks can be expression lambdas or statement blocks and may be nested.
+- All content components have fluent methods: `AddHeading`, `AddH1`–`AddH3`, `AddParagraph`, `AddLine`, `AddImage`, `AddButton`, `AddLink`, `AddDivider` and `AddSpacer`. Parameterless heading/paragraph calls create empty text blocks, so `new Body().AddFrame(f => { f.AddHeading().AddParagraph(); }).AddSpacer(24)` is valid.
+- Leaf methods accept optional named `style` and `mobileStyle` records. `AddImage` also accepts `height`/`linkUrl`; buttons and links accept `title`/`openInNewWindow`. Headings and paragraphs also accept `IEnumerable<TextRun>` for rich text.
+- `WithStyle` replaces desktop overrides; `WithMobileStyle` replaces mobile overrides and accepts `null` to clear them. Body additionally supports `WithLanguage`/`WithCanvasColor`; Row supports `WithGap`/`WithMobileColumns`.
+- **Body, Frame and Row remain immutable:** fluent operations return a new container of the same type. Keep the returned value or chain the next call. This allows an original section to be reused without changing previous emails.
+- Inside callbacks, `FrameBuilder` and `RowBuilder` are mutable composition scopes, so calls such as `f.AddHeading().AddParagraph()` work without assignment. Completed callbacks create immutable snapshots; later changes to a captured builder cannot change the added component. You can also use these builders explicitly and call `Build()` to obtain a Frame/Row snapshot.
+- Callbacks are completed and validated before their component is added to the parent. A failed callback or invalid content does not append a partial section. The existing depth, URL, style and null validation rules remain in effect.
+- The same methods work on `EmailBuilder`, retaining its existing mutable behavior. Both namespaces can be imported together, and the constructor-based API remains supported. Existing EmailBuilder shortcuts keep their original defaults.
+
+`src/QuestMail.Terminal/FluentExample.cs` builds the same complete email as the constructor-based example. Both generate identical HTML and plain text.
+
+Remember to keep the result of operations on immutable containers:
+
+```csharp
+var original = new Body();
+var updated = original.AddHeading("Welcome!");
+// original.Children is still empty; updated contains the heading.
+```
+
+Inside a callback, the builder collects children in place, so `frame.AddHeading("Title");` does not require reassignment. `FrameBuilder.Build()` returns a `Frame`, `RowBuilder.Build()` returns a `Row`, and `EmailBuilder.Build()` returns the final `EmailContent` with `Html` and `Plain` bodies.
 
 ### Component engine
 
@@ -168,7 +223,11 @@ dotnet run --project src/QuestMail.Terminal --configuration Release --no-build
 dotnet pack src/QuestMail.Core/QuestMail.Core.csproj --configuration Release --no-build --no-restore --output artifacts
 ```
 
-The terminal example demonstrates all ten components. Pass `-- --html` to print only the HTML document for preview/export.
+The terminal example demonstrates all ten components. Pass `-- --html` to print only the HTML document for preview/export, or `-- --fluent` to use the equivalent fluent example. Options can be combined:
+
+```sh
+dotnet run --project src/QuestMail.Terminal --configuration Release --no-build -- --fluent --html
+```
 
 ## Project Structure
 
@@ -179,6 +238,13 @@ The solution contains the following projects:
 - **QuestMail.Core.Tests**: Automated component, responsive CSS, encoding, validation and builder-state tests.
 
 The previously empty Shared project has been consolidated into Core to avoid a separate package dependency.
+
+Core namespaces:
+
+- `QuestMail.Core.Components`: Immutable components and existing EmailBuilder shortcuts.
+- `QuestMail.Core.Fluent`: Composition extensions, `FrameBuilder` and `RowBuilder` callback scopes.
+- `QuestMail.Core.Styles`: Reusable component styles, typography, spacing, widths and borders.
+- `QuestMail.Core.Enums`: Typed heading levels, alignment and other style values.
 
 ## CI and releases
 

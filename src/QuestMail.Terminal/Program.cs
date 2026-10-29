@@ -46,7 +46,9 @@ var body = new Body(
     Style = new ComponentStyle { Width = EmailWidth.Max(640), Padding = new Spacing(32) },
     MobileStyle = new ComponentStyle { Padding = new Spacing(16) }
 };
-var email = new EmailBuilder(body).Build();
+var email = new EmailBuilder(args.Contains("--fluent", StringComparer.Ordinal)
+    ? FluentExample.CreateBody(cardStyle)
+    : body).Build();
 
 if (args.Contains("--html", StringComparer.Ordinal))
 {
