@@ -145,6 +145,7 @@ var body = new Body()
 - `WithStyle` replaces the container's desktop override record. It does not merge with previously supplied overrides; component defaults still apply to unset fields. Use `style with { ... }` to derive a variant while retaining other fields.
 - `WithMobileStyle` replaces the mobile override record. Passing `null` clears it. At widths of 480px or less, only specified properties override desktop values.
 - `Body` supports `WithLanguage` and `WithCanvasColor`.
+- `Body` defaults to a 15px outer margin on all sides. Override it with `.WithStyle(new ComponentStyle { Margin = new Spacing(12) })`, or use `new Spacing(0)` to remove it. `WithMobileStyle` can override the margin independently on mobile.
 - `Row` and `RowBuilder` support `WithGap` and `WithMobileColumns`. Desktop layout uses table columns; mobile layout wraps to the requested positive number of columns, defaulting to one.
 - `TypographyStyle` inherits through containers. Other box properties, such as width and padding, do not inherit. Explicit local typography overrides inherited values.
 - An explicitly supplied `align` on heading shortcuts or paragraphs overrides the style's text alignment without removing its other typography settings.

@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Xml.Linq;
 using QuestMail.Core.Components;
 using QuestMail.Core.Enums;
+using QuestMail.Core.Fluent;
 using QuestMail.Core.Styles;
 
 namespace QuestMail.Core.Tests;
@@ -43,6 +44,60 @@ public class ComponentRenderingTests
     }
 
     [Fact]
+    public void BodyDefaultsToFifteenPixelOuterMarginsAcrossConstructionPaths()
+    {
+        var emails = new[]
+        {
+            new EmailBuilder().AddParagraph("Content").Build(),
+            new EmailBuilder(new Body(new Paragraph("Content"))).Build(),
+            new EmailBuilder(new Body(new List<EmailComponent> { new Paragraph("Content") })).Build(),
+            new EmailBuilder(new Body().AddParagraph("Content")).Build()
+        };
+
+        foreach (var email in emails)
+        {
+            var document = XDocument.Parse(email.Html);
+            var margin = Assert.Single(document.Descendants("td"), element => (string?)element.Attribute("class") == "qm-0-margin");
+
+            Assert.Equal("padding:15px 15px 15px 15px;", (string?)margin.Attribute("style"));
+            // Keep the HTML body reset: the component wrapper provides email-compatible outer spacing.
+            Assert.Contains("margin:0;padding:0;", (string)Assert.Single(document.Descendants("body")).Attribute("style")!);
+            Assert.Equal($"Content{Environment.NewLine}", email.Plain);
+        }
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(12)]
+    public void BodyMarginCanBeOverriddenOrRemoved(double pixels)
+    {
+        var body = new Body(new Paragraph("Content"))
+        {
+            Style = new ComponentStyle { Margin = new Spacing(pixels) }
+        };
+        var email = new EmailBuilder(body).Build();
+        var margin = Assert.Single(XDocument.Parse(email.Html).Descendants("td"),
+            element => (string?)element.Attribute("class") == "qm-0-margin");
+
+        Assert.Equal($"padding:{pixels}px {pixels}px {pixels}px {pixels}px;", (string?)margin.Attribute("style"));
+        Assert.Equal($"Content{Environment.NewLine}", email.Plain);
+    }
+
+    [Fact]
+    public void FluentBodyMarginSupportsIndependentSidesWithoutMutatingTheOriginal()
+    {
+        var original = new Body().AddParagraph("Content");
+        var customized = original.WithStyle(new ComponentStyle { Margin = new Spacing(1, 2, 3, 4) });
+        var originalHtml = XDocument.Parse(new EmailBuilder(original).Build().Html);
+        var customizedHtml = XDocument.Parse(new EmailBuilder(customized).Build().Html);
+
+        Assert.Equal("padding:15px 15px 15px 15px;", (string?)Assert.Single(originalHtml.Descendants("td"),
+            element => (string?)element.Attribute("class") == "qm-0-margin").Attribute("style"));
+        Assert.Equal("padding:1px 2px 3px 4px;", (string?)Assert.Single(customizedHtml.Descendants("td"),
+            element => (string?)element.Attribute("class") == "qm-0-margin").Attribute("style"));
+    }
+
+    [Fact]
     public void BodyHasASeparateCanvasAndCenteredContentWithOutlookFallback()
     {
         var email = new EmailBuilder(new Body(new Paragraph("Content"))
@@ -55,6 +110,7 @@ public class ComponentRenderingTests
         Assert.Contains("max-width:640px;", email.Html);
         Assert.Contains("background-color:#ffffff;", email.Html);
         Assert.Contains("padding:32px 32px 32px 32px;", email.Html);
+        Assert.Contains("class=\"qm-0-margin\" align=\"center\" style=\"padding:15px 15px 15px 15px;\"", email.Html);
         Assert.Contains("<!--[if mso]>", email.Html);
         Assert.Contains("width=\"640\" align=\"center\"", email.Html);
     }

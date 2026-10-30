@@ -6,6 +6,7 @@ All project documentation and release notes are maintained in English.
 
 ### Changed
 
+- `Body` now defaults to a 15px outer margin on all sides, configurable through `Style.Margin` and `MobileStyle.Margin`; setting it to zero removes the margin.
 - Release authentication now uses NuGet Trusted Publishing and GitHub OIDC instead of a long-lived repository API key.
 - Publishing is manual-only from `master`, with a required Major, Minor or Patch selection and automatic version increments from the highest stable Git tag (or the project version when no tags exist).
 - Successful NuGet publications create a matching Git tag and GitHub release at the validated commit. Release runs are serialized; automatic triggers and existing-tag recovery publishing have been removed.

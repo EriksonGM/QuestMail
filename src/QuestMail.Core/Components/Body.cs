@@ -3,7 +3,7 @@ using QuestMail.Core.Internal;
 
 namespace QuestMail.Core.Components;
 
-/// <summary>The email root. Defaults to centered, 600px-wide content on a neutral canvas.</summary>
+/// <summary>The email root. Defaults to centered, 600px-wide content with a 15px outer margin on a neutral canvas. Override with Style.Margin.</summary>
 public sealed class Body : ContainerComponent, IComponentComposer<Body>
 {
     public string CanvasColor { get; init; } = "#f3f4f6";

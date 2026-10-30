@@ -70,7 +70,7 @@ internal static class StyleRenderer
         {
             Body => style with
             {
-                Width = EmailWidth.Max(600), BackgroundColor = "#ffffff", Padding = new Spacing(24),
+                Width = EmailWidth.Max(600), BackgroundColor = "#ffffff", Margin = new Spacing(15), Padding = new Spacing(24),
                 HorizontalAlignment = ElementAlignEnum.Center
             },
             Heading heading => TextDefaults(style, (int)heading.Level),

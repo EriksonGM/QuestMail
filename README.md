@@ -175,7 +175,7 @@ var email = new EmailBuilder(body).Build();
 
 | Component | Content and behavior |
 | --- | --- |
-| `Body` | Root children, `Language`, `CanvasColor`. Default centered white content, maximum 600px, padding 24px. |
+| `Body` | Root children, `Language`, `CanvasColor`. Default centered white content, maximum 600px, outer margin 15px, padding 24px. |
 | `Frame` | Vertical grouping of child components. |
 | `Row` | Horizontal table columns, `Gap`, `MobileColumns` (default 1). Child `Style.Width` sets desktop column width; unspecified columns share remaining space. The child fills its allocated column rather than applying the percentage twice. |
 | `Heading` | Text or `IEnumerable<TextRun>`; `HeadingLevelEnum.H1`, `H2` or `H3`. Default font sizes 32, 24 and 20px. |
@@ -197,6 +197,16 @@ All components expose `Style` and `MobileStyle`. Style records support `with` ex
 | `HorizontalAlignment`, `VerticalAlignment` | Left/Center/Right for block positioning; Top/Middle/Bottom for content/columns. Text alignment is a separate typography property. |
 | `Typography` | `TypographyStyle` with font family, pixel size, weight, color, unitless line height, letter spacing, text alignment, italic, decoration, white space and word wrapping. |
 | `Visible` | `false` hides a component; set `Style.Visible = false` and `MobileStyle.Visible = true` for mobile-only content. |
+
+`Body` has a 15px outer margin on all sides by default, even when other styles are customized. Override it using `Style.Margin` or the fluent API; use `new Spacing(0)` to remove it:
+
+```csharp
+var body = new Body()
+    .WithStyle(new ComponentStyle { Margin = new Spacing(12) })
+    .WithMobileStyle(new ComponentStyle { Margin = new Spacing(0) });
+```
+
+The margin uses exterior table-cell padding for email compatibility; the HTML `<body>` margin remains reset to zero to avoid double spacing.
 
 Mobile styles override only supplied properties at widths of 480px or less. Typography inherits through containers, including mobile overrides, while explicit local values win. Widths, padding and other box properties do not inherit. A hidden parent cannot be made visible by its children. Plain text includes blocks visible on either device, in tree order; blocks hidden on both are omitted. Links include destinations, non-decorative images include alt text, dividers become `---`, and positive-height spacers add a blank line.
 

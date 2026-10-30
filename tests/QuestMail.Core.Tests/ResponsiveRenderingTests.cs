@@ -8,6 +8,40 @@ namespace QuestMail.Core.Tests;
 public class ResponsiveRenderingTests
 {
     [Fact]
+    public void BodyMobileStylesKeepTheDefaultMarginWhenItIsNotOverridden()
+    {
+        var email = new EmailBuilder(new Body(new Frame(new Paragraph("Content")))
+        {
+            MobileStyle = new ComponentStyle { Padding = new Spacing(12) }
+        }).Build();
+        var document = XDocument.Parse(email.Html);
+        var bodyMargin = Assert.Single(document.Descendants("td"), element => (string?)element.Attribute("class") == "qm-0-margin");
+        var frameMargin = Assert.Single(document.Descendants("td"), element => (string?)element.Attribute("class") == "qm-1-margin");
+        var css = Assert.Single(document.Descendants("style")).Value;
+
+        Assert.Equal("padding:15px 15px 15px 15px;", (string?)bodyMargin.Attribute("style"));
+        Assert.Equal("padding:0px 0px 0px 0px;", (string?)frameMargin.Attribute("style"));
+        Assert.DoesNotContain(".qm-0-margin{", css);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(8)]
+    public void BodyMarginCanBeOverriddenIndependentlyOnMobile(double pixels)
+    {
+        var email = new EmailBuilder(new Body(new Paragraph("Content"))
+        {
+            MobileStyle = new ComponentStyle { Margin = new Spacing(pixels) }
+        }).Build();
+        var document = XDocument.Parse(email.Html);
+        var margin = Assert.Single(document.Descendants("td"), element => (string?)element.Attribute("class") == "qm-0-margin");
+        var css = Assert.Single(document.Descendants("style")).Value;
+
+        Assert.Equal("padding:15px 15px 15px 15px;", (string?)margin.Attribute("style"));
+        Assert.Contains($".qm-0-margin{{padding:{pixels}px {pixels}px {pixels}px {pixels}px!important;}}", css);
+    }
+
+    [Fact]
     public void RowsHaveTableColumnsOnDesktopAndOneColumnOnMobileByDefault()
     {
         var email = new EmailBuilder().Add(new Row(new Paragraph("First"), new Paragraph("Second"))).Build();
