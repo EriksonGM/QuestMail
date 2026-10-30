@@ -4,8 +4,6 @@ QuestMail is a C# library for building HTML and plain-text email content with a 
 
 **Status:** Early Development
 
-**Current release:** [0.1.0](https://github.com/EriksonGM/QuestMail/releases/tag/v0.1.0) · .NET 10 · MIT
-
 ## Overview
 
 Compose a tree of reusable email components in C#, then pass the generated bodies to your email provider. QuestMail builds content; it does not send messages or manage SMTP connections.
@@ -32,10 +30,10 @@ Dynamic variables, conditions, repetition, custom HTML, compound catalog blocks,
 
 ### Installation
 
-Install QuestMail 0.1.0 from NuGet:
+Install QuestMail from NuGet:
 
 ```sh
-dotnet add package QuestMail --version 0.1.0
+dotnet add package QuestMail
 ```
 
 Alternatively, build from source and use a project reference or a locally generated NuGet package. See the [changelog and migration notes](https://github.com/EriksonGM/QuestMail/blob/master/CHANGELOG.md) for the changes included in this release.
@@ -197,6 +195,7 @@ All components expose `Style` and `MobileStyle`. Style records support `with` ex
 | `HorizontalAlignment`, `VerticalAlignment` | Left/Center/Right for block positioning; Top/Middle/Bottom for content/columns. Text alignment is a separate typography property. |
 | `Typography` | `TypographyStyle` with font family, pixel size, weight, color, unitless line height, letter spacing, text alignment, italic, decoration, white space and word wrapping. |
 | `Visible` | `false` hides a component; set `Style.Visible = false` and `MobileStyle.Visible = true` for mobile-only content. |
+| `CustomCss` | Immutable, validated visual declarations from `CssDeclarations.Create(("text-transform", "uppercase"), ("word-spacing", "2px"))`; also supported in `MobileStyle`. See the [custom CSS guide](https://github.com/EriksonGM/QuestMail/blob/master/docs/custom-css.md) for targets, precedence and restrictions. |
 
 `Body` has a 15px outer margin on all sides by default, even when other styles are customized. Override it using `Style.Margin` or the fluent API; use `new Spacing(0)` to remove it:
 
@@ -261,6 +260,12 @@ Core namespaces:
 - `QuestMail.Core.Fluent`: Composition extensions, `FrameBuilder` and `RowBuilder` callback scopes.
 - `QuestMail.Core.Styles`: Reusable component styles, typography, spacing, widths and borders.
 - `QuestMail.Core.Enums`: Typed heading levels, alignment and other style values.
+
+## Acknowledgements
+
+Special thanks to [MailDev](https://github.com/maildev/maildev) and its contributors for making it easy to capture, preview and test emails during development.
+
+If you find MailDev useful, consider [giving its repository a star on GitHub](https://github.com/maildev/maildev) to show your appreciation and support the project.
 
 ## Contributing
 

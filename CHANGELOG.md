@@ -4,6 +4,14 @@ All project documentation and release notes are maintained in English.
 
 ## Unreleased
 
+### Added
+
+- Twelve reference-inspired email previews, including CarePair password reset, release announcements, branded order/shipment notifications, welcome/onboarding emails and seasonal promotions; cropped reference fragments are omitted.
+- Embedded PNG artwork with editable SVG sources and optional authoring tooling. The MailDev console supports MIME inline Content-ID images without adding image/SMTP dependencies to QuestMail.Core.
+- Immutable `CssDeclarations` and `ComponentStyle.CustomCss` for validated, ordered visual CSS on each component's primary HTML element, with desktop inline styles and mobile overrides.
+- Custom CSS validation rejects structural/unknown properties, CSS functions and URLs, raw rules, declaration/HTML delimiters and `!important` without adding package dependencies.
+- A `custom-css` MailDev preview template and automated coverage for immutability, validation, target elements and typed/custom desktop/mobile precedence.
+
 ### Changed
 
 - `Body` now defaults to a 15px outer margin on all sides, configurable through `Style.Margin` and `MobileStyle.Margin`; setting it to zero removes the margin.
