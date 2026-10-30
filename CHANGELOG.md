@@ -7,7 +7,8 @@ All project documentation and release notes are maintained in English.
 ### Changed
 
 - Release authentication now uses NuGet Trusted Publishing and GitHub OIDC instead of a long-lived repository API key.
-- Manual release recovery can validate and publish an existing stable tag using the workflow on `master`, without rewriting the tag.
+- Publishing is manual-only from `master`, with a required Maior, Minor or Fix selection and automatic version increments from the highest stable Git tag (or the project version when no tags exist).
+- Successful NuGet publications create a matching Git tag and GitHub release at the validated commit. Release runs are serialized; automatic triggers and existing-tag recovery publishing have been removed.
 
 ## [0.1.0] - 2026-10-29
 
