@@ -20,6 +20,8 @@ internal static partial class ComponentValidation
         {
             case Body body:
                 Guard.Color(body.CanvasColor, nameof(body.CanvasColor));
+                if (body.TrackingPixelUrl is { } trackingPixelUrl)
+                    Guard.HttpUrl(trackingPixelUrl, nameof(body.TrackingPixelUrl));
                 ArgumentNullException.ThrowIfNull(body.Language);
                 if (!LanguagePattern().IsMatch(body.Language))
                     throw new ArgumentException("Use a language tag such as en or es-MX.", nameof(body.Language));

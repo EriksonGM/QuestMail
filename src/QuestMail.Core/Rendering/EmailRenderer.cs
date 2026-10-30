@@ -36,12 +36,16 @@ internal sealed class EmailRenderer
             {responsive}
             </head>
             <body style="margin:0;padding:0;background-color:{body.CanvasColor};">
-            <table {Table} width="100%" style="width:100%;background-color:{body.CanvasColor};"><tbody><tr><td>{content}</td></tr></tbody></table>
+            <table {Table} width="100%" style="width:100%;background-color:{body.CanvasColor};"><tbody><tr><td>{content}</td></tr></tbody></table>{RenderTrackingPixel(body.TrackingPixelUrl)}
             </body>
             </html>
             """;
         return new EmailContent(html, _plain.ToString());
     }
+
+    private static string RenderTrackingPixel(string? url) => url is null ? "" :
+        $"<img src=\"{Encode(url)}\" class=\"qm-tracking-pixel\" width=\"1\" height=\"1\" alt=\"\" role=\"presentation\" aria-hidden=\"true\" " +
+        "style=\"position:absolute;left:0;top:0;display:block;width:1px;height:1px;max-width:1px;max-height:1px;overflow:hidden;opacity:0;border:0;outline:none;pointer-events:none;\" />";
 
     private static (ComponentStyle Desktop, ComponentStyle Mobile) Resolve(EmailComponent component, Context parent)
     {

@@ -8,6 +8,8 @@ public sealed class Body : ContainerComponent, IComponentComposer<Body>
 {
     public string CanvasColor { get; init; } = "#f3f4f6";
     public string Language { get; init; } = "en";
+    /// <summary>Optional absolute HTTP(S) URL rendered as a non-layout 1×1 open-tracking image. Null disables tracking.</summary>
+    public string? TrackingPixelUrl { get; init; }
 
     public Body(params EmailComponent[] children) : base(children) { }
     public Body(IEnumerable<EmailComponent> children) : base(children) { }

@@ -27,7 +27,8 @@ public static class ContainerFluentExtensions
         ArgumentNullException.ThrowIfNull(language);
         return ContainerOperations.Validate(new Body(body.Children)
         {
-            Language = language, CanvasColor = body.CanvasColor, Style = body.Style, MobileStyle = body.MobileStyle
+            Language = language, CanvasColor = body.CanvasColor, TrackingPixelUrl = body.TrackingPixelUrl,
+            Style = body.Style, MobileStyle = body.MobileStyle
         });
     }
 
@@ -37,7 +38,19 @@ public static class ContainerFluentExtensions
         ArgumentNullException.ThrowIfNull(color);
         return ContainerOperations.Validate(new Body(body.Children)
         {
-            Language = body.Language, CanvasColor = color, Style = body.Style, MobileStyle = body.MobileStyle
+            Language = body.Language, CanvasColor = color, TrackingPixelUrl = body.TrackingPixelUrl,
+            Style = body.Style, MobileStyle = body.MobileStyle
+        });
+    }
+
+    /// <summary>Returns a new body with an optional HTTP(S) tracking pixel. Pass null to disable it.</summary>
+    public static Body WithTrackingPixel(this Body body, string? url)
+    {
+        ArgumentNullException.ThrowIfNull(body);
+        return ContainerOperations.Validate(new Body(body.Children)
+        {
+            Language = body.Language, CanvasColor = body.CanvasColor, TrackingPixelUrl = url,
+            Style = body.Style, MobileStyle = body.MobileStyle
         });
     }
 

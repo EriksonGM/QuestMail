@@ -46,6 +46,15 @@ internal static partial class Guard
                 "Links require an HTTP, HTTPS, mailto or tel URL.", name);
     }
 
+    public static void HttpUrl(string value, string name)
+    {
+        ArgumentNullException.ThrowIfNull(value, name);
+        if (value != value.Trim() || value.Any(char.IsControl) ||
+            !Uri.TryCreate(value, UriKind.Absolute, out var uri) ||
+            uri.Scheme is not ("https" or "http") || string.IsNullOrWhiteSpace(uri.Host))
+            throw new ArgumentException("An absolute HTTP or HTTPS URL without control characters is required.", name);
+    }
+
     public static string NormalizeText(string text, string name = "text")
     {
         ArgumentNullException.ThrowIfNull(text, name);

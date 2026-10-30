@@ -6,6 +6,7 @@ All project documentation and release notes are maintained in English.
 
 ### Added
 
+- Optional `Body.TrackingPixelUrl` and immutable `WithTrackingPixel(url)` configuration for a decorative, non-layout 1×1 HTTP(S) open-tracking image, disabled by default and omitted from plain text. Documentation covers endpoint requirements, privacy and mail-client reliability limitations.
 - Twelve reference-inspired email previews, including CarePair password reset, release announcements, branded order/shipment notifications, welcome/onboarding emails and seasonal promotions; cropped reference fragments are omitted.
 - Embedded PNG artwork with editable SVG sources and optional authoring tooling. The MailDev console supports MIME inline Content-ID images without adding image/SMTP dependencies to QuestMail.Core.
 - Immutable `CssDeclarations` and `ComponentStyle.CustomCss` for validated, ordered visual CSS on each component's primary HTML element, with desktop inline styles and mobile overrides.

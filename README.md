@@ -173,7 +173,7 @@ var email = new EmailBuilder(body).Build();
 
 | Component | Content and behavior |
 | --- | --- |
-| `Body` | Root children, `Language`, `CanvasColor`. Default centered white content, maximum 600px, outer margin 15px, padding 24px. |
+| `Body` | Root children, `Language`, `CanvasColor`, optional `TrackingPixelUrl`. Default centered white content, maximum 600px, outer margin 15px, padding 24px. |
 | `Frame` | Vertical grouping of child components. |
 | `Row` | Horizontal table columns, `Gap`, `MobileColumns` (default 1). Child `Style.Width` sets desktop column width; unspecified columns share remaining space. The child fills its allocated column rather than applying the percentage twice. |
 | `Heading` | Text or `IEnumerable<TextRun>`; `HeadingLevelEnum.H1`, `H2` or `H3`. Default font sizes 32, 24 and 20px. |
@@ -206,6 +206,8 @@ var body = new Body()
 ```
 
 The margin uses exterior table-cell padding for email compatibility; the HTML `<body>` margin remains reset to zero to avoid double spacing.
+
+Optional open tracking is available through `body.WithTrackingPixel("https://tracking.example.com/open.gif?message=sample-123")` or `Body.TrackingPixelUrl`. It emits a non-layout 1×1 image in HTML only and is disabled by default; pass `null` to disable it. Image blocking, caching and privacy-prefetching mean requests are not guaranteed or an exact measure of human opens. See the [tracking pixel guide](https://github.com/EriksonGM/QuestMail/blob/master/docs/tracking-pixel.md) for endpoint requirements, client limitations and privacy considerations.
 
 Mobile styles override only supplied properties at widths of 480px or less. Typography inherits through containers, including mobile overrides, while explicit local values win. Widths, padding and other box properties do not inherit. A hidden parent cannot be made visible by its children. Plain text includes blocks visible on either device, in tree order; blocks hidden on both are omitted. Links include destinations, non-decorative images include alt text, dividers become `---`, and positive-height spacers add a blank line.
 

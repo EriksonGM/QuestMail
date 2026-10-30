@@ -22,7 +22,8 @@ internal static class ContainerOperations
         {
             Body body => new Body(children)
             {
-                Language = body.Language, CanvasColor = body.CanvasColor, Style = style, MobileStyle = mobileStyle
+                Language = body.Language, CanvasColor = body.CanvasColor, TrackingPixelUrl = body.TrackingPixelUrl,
+                Style = style, MobileStyle = mobileStyle
             },
             Frame => new Frame(children) { Style = style, MobileStyle = mobileStyle },
             Row row => new Row(children)
