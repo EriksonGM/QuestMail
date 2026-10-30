@@ -233,11 +233,15 @@ dotnet run --project src/QuestMail.Terminal --configuration Release --no-build -
 
 ## Project Structure
 
+For local email delivery and visual previews, see [MailDev test setup](https://github.com/EriksonGM/QuestMail/blob/master/tests/README.md).
+
 The solution contains the following projects:
 
 - **QuestMail.Core**: The core library containing the main logic for building emails.
 - **QuestMail.Terminal**: Runnable example that prints HTML and plain text.
 - **QuestMail.Core.Tests**: Automated component, responsive CSS, encoding, validation and builder-state tests.
+- **QuestMail.MailDev**: Local console that sends the templates in `tests/QuestMail.MailDev/Templates` to MailDev.
+- **QuestMail.MailDev.Tests**: Automated preview-template, MIME message and configuration tests (no SMTP server required).
 
 The previously empty Shared project has been consolidated into Core to avoid a separate package dependency.
 
