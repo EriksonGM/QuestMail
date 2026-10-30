@@ -47,7 +47,7 @@ internal static class StyleRenderer
         WordWrap = value.WordWrap ?? parent.WordWrap
     };
 
-    public static ComponentStyle Merge(ComponentStyle parent, ComponentStyle? value) => value is null ? parent : new()
+    public static ComponentStyle Merge(ComponentStyle parent, ComponentStyle? value, EmailComponent component) => value is null ? parent : new()
     {
         Width = value.Width ?? parent.Width,
         MaxWidth = value.MaxWidth ?? parent.MaxWidth,
@@ -60,8 +60,41 @@ internal static class StyleRenderer
         HorizontalAlignment = value.HorizontalAlignment ?? parent.HorizontalAlignment,
         VerticalAlignment = value.VerticalAlignment ?? parent.VerticalAlignment,
         Typography = Merge(parent.Typography ?? new(), value.Typography),
-        Visible = value.Visible ?? parent.Visible
+        Visible = value.Visible ?? parent.Visible,
+        CustomCss = MergeCustomCss(parent.CustomCss, value, component)
     };
+
+    private static CssDeclarations? MergeCustomCss(CssDeclarations? parent, ComponentStyle value, EmailComponent component)
+    {
+        if (parent is null) return value.CustomCss;
+
+        // A mobile typed override takes precedence over conflicting desktop custom declarations.
+        // Mobile custom declarations are applied last, including shorthand/longhand cascade order.
+        var overridden = new HashSet<string>(StringComparer.Ordinal);
+        if (component is Body or Frame or Row or TextComponent or Line or Link or Button && value.Typography is { } typography)
+        {
+            foreach (var declaration in Typography(typography).Split(';', StringSplitOptions.RemoveEmptyEntries))
+                overridden.Add(declaration[..declaration.IndexOf(':')]);
+            if (typography.Decoration is not null)
+                overridden.UnionWith(["text-decoration-line", "text-decoration-color", "text-decoration-style"]);
+        }
+        var container = component is Body or Frame or Row;
+        if (container && value.BackgroundColor is not null) overridden.Add("background-color");
+        if (component is Body or Frame or Row or Button or Image && value.BorderRadius is not null)
+            overridden.Add("border-radius");
+        return parent.Without(property => overridden.Contains(property) ||
+            (container && value.Border is not null && property.StartsWith("border-", StringComparison.Ordinal) && property != "border-radius"))
+            .Overlay(value.CustomCss);
+    }
+
+    public static string CustomCss(ComponentStyle style) => style.CustomCss?.ToString() ?? "";
+
+    public static string PrimaryBox(EmailComponent component, ComponentStyle style) =>
+        Box(style) + (component is Body or Frame or Row &&
+            (component.Style.CustomCss is { Count: > 0 } || component.MobileStyle?.CustomCss is { Count: > 0 })
+            ? Typography(style.Typography!) + CustomCss(style) : "");
+
+    public static string TextCss(ComponentStyle style) => Typography(style.Typography!) + CustomCss(style);
 
     public static ComponentStyle Defaults(EmailComponent component)
     {

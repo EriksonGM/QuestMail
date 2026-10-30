@@ -149,6 +149,7 @@ var body = new Body()
 - `Row` and `RowBuilder` support `WithGap` and `WithMobileColumns`. Desktop layout uses table columns; mobile layout wraps to the requested positive number of columns, defaulting to one.
 - `TypographyStyle` inherits through containers. Other box properties, such as width and padding, do not inherit. Explicit local typography overrides inherited values.
 - An explicitly supplied `align` on heading shortcuts or paragraphs overrides the style's text alignment without removing its other typography settings.
+- `ComponentStyle.CustomCss` accepts immutable `CssDeclarations` for a restricted set of visual properties, emitted inline on the primary element. `MobileStyle.CustomCss` supplies mobile overrides. See the [custom CSS guide](custom-css.md) for examples, element targets, precedence, value validation and email-client limitations.
 
 For the full style model and client compatibility limitations, see the [component engine reference in the README](../README.md#component-engine). Media-query support and Outlook CSS support vary by email client; a browser preview is not cross-client certification.
 

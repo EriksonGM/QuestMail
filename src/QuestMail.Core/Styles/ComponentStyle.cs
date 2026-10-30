@@ -17,4 +17,6 @@ public sealed record ComponentStyle
     public VerticalAlignEnum? VerticalAlignment { get; init; }
     public TypographyStyle? Typography { get; init; }
     public bool? Visible { get; init; }
+    /// <summary>Validated visual CSS for the primary element. Not copied to child styles; normal HTML/CSS inheritance still applies.</summary>
+    public CssDeclarations? CustomCss { get; init; }
 }

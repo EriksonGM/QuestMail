@@ -46,12 +46,12 @@ internal sealed class EmailRenderer
     private static (ComponentStyle Desktop, ComponentStyle Mobile) Resolve(EmailComponent component, Context parent)
     {
         var defaults = Defaults(component);
-        var desktop = Merge(defaults, component.Style) with
+        var desktop = Merge(defaults, component.Style, component) with
         {
             Typography = Merge(Merge(parent.Desktop, defaults.Typography), component.Style.Typography),
             Visible = parent.DesktopVisible && component.Style.Visible != false
         };
-        var mobile = Merge(desktop, component.MobileStyle) with
+        var mobile = Merge(desktop, component.MobileStyle, component) with
         {
             Typography = Merge(Merge(Merge(parent.Mobile, defaults.Typography), component.Style.Typography), component.MobileStyle?.Typography),
             Visible = parent.MobileVisible && (component.MobileStyle?.Visible ?? component.Style.Visible) != false
@@ -87,7 +87,7 @@ internal sealed class EmailRenderer
             Link link => RenderLink(link, id, desktop),
             Button button => RenderButton(button, id, desktop),
             Image image => RenderImage(image, id, desktop),
-            Divider divider => RenderDivider(divider),
+            Divider divider => RenderDivider(divider, id, desktop),
             Spacer => RenderSpacer(id, desktop, mobile),
             _ => throw new NotSupportedException($"Unknown component: {component.GetType().Name}")
         };
@@ -104,7 +104,7 @@ internal sealed class EmailRenderer
 
         return $"<table {Table} class=\"{id}-wrap\" width=\"100%\" style=\"width:100%;{hidden}\"><tbody><tr>" +
             $"<td class=\"{id}-margin\" align=\"{Horizontal(desktop.HorizontalAlignment)}\" style=\"padding:{Space(desktop.Margin)};\">{ghostOpen}" +
-            $"<table {Table} class=\"{id}-box\"{WidthAttribute(desktop)} align=\"{Horizontal(desktop.HorizontalAlignment)}\" style=\"{Encode(Box(desktop))}\"><tbody><tr>" +
+            $"<table {Table} class=\"{id}-box\"{WidthAttribute(desktop)} align=\"{Horizontal(desktop.HorizontalAlignment)}\" style=\"{Encode(PrimaryBox(component, desktop))}\"><tbody><tr>" +
             $"<td class=\"{id}-content\" valign=\"{Vertical(desktop.VerticalAlignment)}\" style=\"{padding}vertical-align:{Vertical(desktop.VerticalAlignment)};\">{content}</td>" +
             $"</tr></tbody></table>{ghostClose}</td></tr></tbody></table>";
     }
@@ -156,13 +156,13 @@ internal sealed class EmailRenderer
             if (run.Url is not null) _plain.Append($" ({run.Url})");
         }
         _plain.AppendLine();
-        return $"<{tag} style=\"{Encode("margin:0;" + Typography(style.Typography!))}\" class=\"{id}-text\">{html}</{tag}>";
+        return $"<{tag} style=\"{Encode("margin:0;" + TextCss(style))}\" class=\"{id}-text\">{html}</{tag}>";
     }
 
     private string RenderLink(Link link, string id, ComponentStyle style)
     {
         _plain.AppendLine($"{PlainText(link.Text)} ({link.Url})");
-        return $"<a href=\"{Encode(link.Url)}\"{LinkAttributes(link.Title, link.OpenInNewWindow)} class=\"{id}-text\" style=\"{Encode("display:block;" + Typography(style.Typography!))}\">{Text(link.Text)}</a>";
+        return $"<a href=\"{Encode(link.Url)}\"{LinkAttributes(link.Title, link.OpenInNewWindow)} class=\"{id}-text\" style=\"{Encode("display:block;" + TextCss(style))}\">{Text(link.Text)}</a>";
     }
 
     private string RenderButton(Button button, string id, ComponentStyle style)
@@ -172,7 +172,7 @@ internal sealed class EmailRenderer
     }
 
     private static string ButtonCss(ComponentStyle style) =>
-        $"display:block;box-sizing:border-box;padding:{Space(style.Padding)};border-radius:{Number(style.BorderRadius ?? 0)}px;" + Typography(style.Typography!);
+        $"display:block;box-sizing:border-box;padding:{Space(style.Padding)};border-radius:{Number(style.BorderRadius ?? 0)}px;" + TextCss(style);
 
     private string RenderImage(Image image, string id, ComponentStyle style)
     {
@@ -188,14 +188,16 @@ internal sealed class EmailRenderer
     private static string ImageCss(ComponentStyle style) =>
         "display:block;border:0;outline:none;text-decoration:none;" + Width(style) +
         (Maximum(style) is null ? "max-width:100%;" : "") +
-        $"height:{(style.Height is { } height ? Number(height) + "px" : "auto")};border-radius:{Number(style.BorderRadius ?? 0)}px;";
+        $"height:{(style.Height is { } height ? Number(height) + "px" : "auto")};border-radius:{Number(style.BorderRadius ?? 0)}px;" + CustomCss(style);
 
-    private string RenderDivider(Divider divider)
+    private string RenderDivider(Divider divider, string id, ComponentStyle style)
     {
         _plain.AppendLine("---");
-        var border = Border(new EmailBorder(divider.Thickness, divider.Color, divider.LineStyle));
-        return $"<table {Table} width=\"100%\" style=\"width:100%;\"><tbody><tr><td role=\"separator\" style=\"border-top:{border};font-size:0;line-height:0;\">&#8203;</td></tr></tbody></table>";
+        return $"<table {Table} width=\"100%\" style=\"width:100%;\"><tbody><tr><td role=\"separator\" class=\"{id}-separator\" style=\"{Encode(DividerCss(divider, style))}\">&#8203;</td></tr></tbody></table>";
     }
+
+    private static string DividerCss(Divider divider, ComponentStyle style) =>
+        $"border-top:{Border(new EmailBorder(divider.Thickness, divider.Color, divider.LineStyle))};font-size:0;line-height:0;" + CustomCss(style);
 
     private string RenderSpacer(string id, ComponentStyle desktop, ComponentStyle mobile)
     {
@@ -205,7 +207,7 @@ internal sealed class EmailRenderer
     }
 
     private static string SpacerCss(ComponentStyle style) =>
-        $"height:{Number(style.Height ?? 0)}px;line-height:{Number(style.Height ?? 0)}px;font-size:1px;mso-line-height-rule:exactly;";
+        $"height:{Number(style.Height ?? 0)}px;line-height:{Number(style.Height ?? 0)}px;font-size:1px;mso-line-height-rule:exactly;" + CustomCss(style);
 
     private static string LinkAttributes(string? title, bool newWindow) =>
         (title is null ? "" : $" title=\"{Encode(title)}\"") +
@@ -218,20 +220,22 @@ internal sealed class EmailRenderer
         if (desktop.Visible != mobile.Visible)
             Rule($".{id}-wrap", mobile.Visible == false ? "display:none;max-height:0;overflow:hidden;" :
                 "display:table;max-height:none;overflow:visible;");
-        if (Box(desktop) != Box(mobile)) Rule($".{id}-box", Box(mobile));
+        if (PrimaryBox(component, desktop) != PrimaryBox(component, mobile)) Rule($".{id}-box", PrimaryBox(component, mobile));
         if (desktop.Margin != mobile.Margin) Rule($".{id}-margin", $"padding:{Space(mobile.Margin)};");
         if (desktop.Padding != mobile.Padding && component is not Button)
             Rule($".{id}-content", $"padding:{Space(mobile.Padding)};");
         if (desktop.VerticalAlignment != mobile.VerticalAlignment)
             Rule($".{id}-content", $"vertical-align:{Vertical(mobile.VerticalAlignment)};");
-        if (component is TextComponent or Line or Link && desktop.Typography != mobile.Typography)
-            Rule($".{id}-text", Typography(mobile.Typography!));
+        if (component is TextComponent or Line or Link && TextCss(desktop) != TextCss(mobile))
+            Rule($".{id}-text", TextCss(mobile));
         if (component is Button && ButtonCss(desktop) != ButtonCss(mobile))
             Rule($".{id}-text", ButtonCss(mobile));
         if (component is Image && ImageCss(desktop) != ImageCss(mobile))
             Rule($".{id}-image", ImageCss(mobile));
-        if (component is Spacer && desktop.Height != mobile.Height)
+        if (component is Spacer && SpacerCss(desktop) != SpacerCss(mobile))
             Rule($".{id}-spacer", SpacerCss(mobile));
+        if (component is Divider divider && DividerCss(divider, desktop) != DividerCss(divider, mobile))
+            Rule($".{id}-separator", DividerCss(divider, mobile));
     }
 
     private void Rule(string selector, string css) =>
