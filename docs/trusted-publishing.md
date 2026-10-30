@@ -23,6 +23,7 @@ This configuration must be created on nuget.org by an authorized account owner. 
 
 - `.github/workflows/publish.yml` grants `id-token: write` only to the publish job.
 - The only trigger is `workflow_dispatch`; pull requests, branch/tag pushes and GitHub release events do not start this workflow.
+- The separate `ci.yml` workflow validates PRs, pushes to `master` and merge-queue candidates with read-only repository permissions. It does not use the release environment, request OIDC publishing credentials or publish packages.
 - The publish job uses `NuGet/login@v1` to obtain a temporary key immediately before `dotnet nuget push`.
 - The publish job declares `environment: released` so its OIDC identity matches the trust policy's required environment.
 - Only manual release runs from `master` can reach the publish job. The required release type is restricted to `Major`, `Minor` or `Patch`; the version is calculated automatically.
@@ -34,7 +35,7 @@ This configuration must be created on nuget.org by an authorized account owner. 
 ## Publish a new release
 
 1. Configure the NuGet trust policy described above.
-2. Commit and push the code to release to `master`.
+2. Integrate release-ready changes into `master` through reviewed PRs with passing `ci-validation`, using merge commits as required by the [collaboration policy](../CONTRIBUTING.md). Do not push feature work directly to `master`.
 3. Open GitHub **Actions → Build, Test and Publish → Run workflow**.
 4. Select the `master` branch and the required release type:
    - **Major**: `1.2.3` → `2.0.0`.

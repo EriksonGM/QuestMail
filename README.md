@@ -271,7 +271,7 @@ If you find MailDev useful, consider [giving its repository a star on GitHub](ht
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Follow the [contribution and collaboration policy](https://github.com/EriksonGM/QuestMail/blob/master/CONTRIBUTING.md): short-lived task branches, reviewed PRs to `master`, passing CI and merge commits. Coding agents must also follow [AGENTS.md](https://github.com/EriksonGM/QuestMail/blob/master/AGENTS.md).
 
 ## License
 
