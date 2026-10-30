@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+  merge_group:
+    types: [checks_requested]
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  PACKAGE_VERSION: 0.1.0-ci.${{ github.run_number }}
+
+jobs:
+  validate:
+    name: ci-validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout integration candidate
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Test release notes generation
+        run: python3 -m unittest discover -s .github/scripts -p 'test_*.py'
+
+      - name: Restore dependencies
+        run: dotnet restore QuestMail.slnx
+
+      - name: Build
+        run: dotnet build QuestMail.slnx --configuration Release --no-restore -p:Version=${{ env.PACKAGE_VERSION }}
+
+      - name: Test
+        run: dotnet test --solution QuestMail.slnx --configuration Release --no-build --no-restore --report-trx --results-directory ./TestResults
+
+      - name: Validate local NuGet packing (never publish)
+        run: dotnet pack ./src/QuestMail.Core/QuestMail.Core.csproj --configuration Release --no-build --no-restore -p:Version=${{ env.PACKAGE_VERSION }} --output ./artifacts
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-test-results
+          path: TestResults/*.trx
+          if-no-files-found: warn
+          retention-days: 7

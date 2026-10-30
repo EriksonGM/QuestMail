@@ -6,6 +6,8 @@ All project documentation and release notes are maintained in English.
 
 ### Added
 
+- Repository-wide `AGENTS.md`, a required contribution/collaboration policy and a PR checklist covering isolated branches, review, merge commits, validation and release traceability. GitHub protection/merge-queue activation is documented as an administrator setup step.
+- A read-only CI workflow for PRs, `master` pushes and merge-queue candidates, with a stable `ci-validation` check, .NET/release-note tests and local package validation; publication remains manual-only.
 - GitHub releases now include an automatic changelog of all commits since the previous stable tag, including direct and merged commits, commit links and a full version comparison; first releases include the complete validated history.
 - Optional `Body.TrackingPixelUrl` and immutable `WithTrackingPixel(url)` configuration for a decorative, non-layout 1×1 HTTP(S) open-tracking image, disabled by default and omitted from plain text. Documentation covers endpoint requirements, privacy and mail-client reliability limitations.
 - Twelve reference-inspired email previews, including CarePair password reset, release announcements, branded order/shipment notifications, welcome/onboarding emails and seasonal promotions; cropped reference fragments are omitted.
