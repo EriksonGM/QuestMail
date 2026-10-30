@@ -48,6 +48,18 @@ The commit selected when starting the workflow is built, tested and packaged wit
 
 If NuGet publication succeeds but GitHub release creation fails, create the matching tag/release at the validated commit before starting another release, so the version baseline stays synchronized. Do not try to overwrite the package already published on NuGet.
 
+## Automatic release changelog
+
+Each release description lists **every commit** after the previous stable version tag up to the exact validated commit, including direct pushes, merged branch commits and merge commits. Each entry contains the commit subject and a link to its full commit; the description also includes a full comparison link between version tags. Commit subjects are escaped as Markdown text rather than interpreted as formatting or HTML.
+
+The version calculation passes its previous stable tag to the publish job, so the changelog uses the same baseline as the automatic version increment. The publish job checks out the validated SHA with complete history and generates `release-notes.md` before requesting NuGet credentials or publishing the package. `gh release create --notes-file` then uses that file instead of GitHub's PR-oriented `--generate-notes`.
+
+If there are no stable tags, the first release includes all commits reachable from the validated SHA. If there are no new commits, the description states that explicitly. A missing previous tag or a tag that is not an ancestor of the validated commit fails the workflow before NuGet publication rather than silently generating the wrong range. Work pushed after the workflow's selected SHA is not included.
+
+This updates the **GitHub release description**, not the maintained `CHANGELOG.md` file. Release triggering remains manual-only, and NuGet publication still uses Trusted Publishing with environment `released`.
+
+Generator tests run in the validate job and can also be run locally with `python -m unittest discover -s .github/scripts -p 'test_*.py'`. They create temporary local Git repositories and never call GitHub or publish packages.
+
 ## Troubleshooting
 
 - **OIDC login denied:** verify the NuGet user, repository owner, repository name, workflow file name and `released` environment. The workflow must match an active NuGet trust policy.

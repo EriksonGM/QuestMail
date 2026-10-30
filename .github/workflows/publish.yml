@@ -26,6 +26,7 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
       release_tag: ${{ steps.version.outputs.release_tag }}
+      previous_tag: ${{ steps.version.outputs.previous_tag }}
 
     steps:
       - name: Require a manual release from master
@@ -41,6 +42,9 @@ jobs:
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
+
+      - name: Test release notes generation
+        run: python3 -m unittest discover -s .github/scripts -p 'test_*.py'
 
       - name: Determine package version
         id: version
@@ -62,7 +66,9 @@ jobs:
           ]
           if versions:
               current = max(versions)
+              previous_tag = "v" + ".".join(map(str, current))
           else:
+              previous_tag = ""
               project_version = ET.parse("src/QuestMail.Core/QuestMail.Core.csproj").findtext("PropertyGroup/Version")
               match = stable_version.fullmatch(project_version or "")
               if not match:
@@ -82,7 +88,7 @@ jobs:
 
           version = ".".join(map(str, next_version))
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
-              output.write(f"version={version}\nrelease_tag=v{version}\n")
+              output.write(f"version={version}\nrelease_tag=v{version}\nprevious_tag={previous_tag}\n")
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
               summary.write(f"## Release\n\n{release_type}: {'.'.join(map(str, current))} → **{version}**\n")
 
@@ -128,6 +134,26 @@ jobs:
       id-token: write
 
     steps:
+      - name: Checkout validated source and complete history
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Generate changelog from all commits since the previous version
+        env:
+          PREVIOUS_TAG: ${{ needs.validate.outputs.previous_tag }}
+          RELEASE_TAG: ${{ needs.validate.outputs.release_tag }}
+        shell: bash
+        run: |
+          python3 .github/scripts/generate_release_notes.py \
+            --previous-tag "$PREVIOUS_TAG" \
+            --source-ref "$GITHUB_SHA" \
+            --release-tag "$RELEASE_TAG" \
+            --repository "$GITHUB_REPOSITORY" \
+            --output release-notes.md
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -165,4 +191,4 @@ jobs:
           gh release create "$RELEASE_TAG" \
             --target "$GITHUB_SHA" \
             --title "QuestMail $PACKAGE_VERSION" \
-            --generate-notes
+            --notes-file release-notes.md
