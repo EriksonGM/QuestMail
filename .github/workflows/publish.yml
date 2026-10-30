@@ -4,14 +4,14 @@ on:
   workflow_dispatch:
     inputs:
       release_type:
-        description: 'Release type (Maior = major, Minor = minor, Fix = patch)'
+        description: 'Release type (Major, Minor or Patch)'
         required: true
         type: choice
         options:
-          - Maior
+          - Major
           - Minor
-          - Fix
-        default: Fix
+          - Patch
+        default: Patch
 
 permissions:
   contents: read
@@ -71,14 +71,14 @@ jobs:
 
           major, minor, patch = current
           release_type = os.environ["RELEASE_TYPE"]
-          if release_type == "Maior":
+          if release_type == "Major":
               next_version = (major + 1, 0, 0)
           elif release_type == "Minor":
               next_version = (major, minor + 1, 0)
-          elif release_type == "Fix":
+          elif release_type == "Patch":
               next_version = (major, minor, patch + 1)
           else:
-              raise SystemExit("::error::Release type must be Maior, Minor or Fix.")
+              raise SystemExit("::error::Release type must be Major, Minor or Patch.")
 
           version = ".".join(map(str, next_version))
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:

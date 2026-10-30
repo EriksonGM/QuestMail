@@ -24,7 +24,7 @@ This configuration must be created on nuget.org by an authorized account owner. 
 - `.github/workflows/publish.yml` grants `id-token: write` only to the publish job.
 - The only trigger is `workflow_dispatch`; pull requests, branch/tag pushes and GitHub release events do not start this workflow.
 - The publish job uses `NuGet/login@v1` to obtain a temporary key immediately before `dotnet nuget push`.
-- Only manual release runs from `master` can reach the publish job. The required release type is restricted to `Maior`, `Minor` or `Fix`; the version is calculated automatically.
+- Only manual release runs from `master` can reach the publish job. The required release type is restricted to `Major`, `Minor` or `Patch`; the version is calculated automatically.
 - Validation has read-only repository permissions and must succeed before publishing.
 - Only the publish job has `contents: write`, to create the version tag and GitHub release after NuGet publication succeeds.
 - A shared concurrency group serializes release runs, so two runs cannot calculate and publish a version simultaneously.
@@ -36,9 +36,9 @@ This configuration must be created on nuget.org by an authorized account owner. 
 2. Commit and push the code to release to `master`.
 3. Open GitHub **Actions → Build, Test and Publish → Run workflow**.
 4. Select the `master` branch and the required release type:
-   - **Maior**: `1.2.3` → `2.0.0`.
+   - **Major**: `1.2.3` → `2.0.0`.
    - **Minor**: `1.2.3` → `1.3.0`.
-   - **Fix**: `1.2.3` → `1.2.4`.
+   - **Patch**: `1.2.3` → `1.2.4`.
 5. Start the workflow and check that both `validate` and `publish` succeed.
 
 The workflow reads all Git tags and increments the highest stable `vMAJOR.MINOR.PATCH` version using numeric ordering, ignoring prerelease and unrelated tags. If no stable tag exists, the version in `QuestMail.Core.csproj` is the baseline. There is no manual version/tag input.
