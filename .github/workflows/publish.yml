@@ -122,6 +122,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master'
     needs: validate
     runs-on: ubuntu-latest
+    environment: released
     permissions:
       contents: write
       id-token: write

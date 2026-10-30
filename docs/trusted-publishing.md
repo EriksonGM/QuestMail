@@ -11,9 +11,9 @@ Sign in to nuget.org as **EriksonG**, the NuGet profile expected to create the p
 | Repository owner | `EriksonGM` |
 | Repository | `QuestMail` |
 | Workflow file | `publish.yml` |
-| Environment | Leave empty |
+| Environment | `released` |
 
-Enter only the workflow file name, not `.github/workflows/publish.yml`. The current publish job does not use a GitHub environment, so setting an environment in the policy would prevent the identity from matching.
+Enter only the workflow file name, not `.github/workflows/publish.yml`. The publish job uses the GitHub environment `released`, which must match the environment configured in the NuGet trust policy. Configure any required approvals or deployment branch restrictions for this environment in GitHub **Settings → Environments → released**, allowing releases from `master`.
 
 The policy must permit publishing versions of the `QuestMail` package. The `user` input of `NuGet/login` must be the NuGet profile that **created the policy**, not the GitHub login, an email address or a package-owning organization name. The current workflow expects the creator to be `EriksonG`. If a different NuGet profile created your policy, update `user` to that profile and verify its permission to publish `QuestMail`.
 
@@ -24,6 +24,7 @@ This configuration must be created on nuget.org by an authorized account owner. 
 - `.github/workflows/publish.yml` grants `id-token: write` only to the publish job.
 - The only trigger is `workflow_dispatch`; pull requests, branch/tag pushes and GitHub release events do not start this workflow.
 - The publish job uses `NuGet/login@v1` to obtain a temporary key immediately before `dotnet nuget push`.
+- The publish job declares `environment: released` so its OIDC identity matches the trust policy's required environment.
 - Only manual release runs from `master` can reach the publish job. The required release type is restricted to `Major`, `Minor` or `Patch`; the version is calculated automatically.
 - Validation has read-only repository permissions and must succeed before publishing.
 - Only the publish job has `contents: write`, to create the version tag and GitHub release after NuGet publication succeeds.
@@ -49,7 +50,8 @@ If NuGet publication succeeds but GitHub release creation fails, create the matc
 
 ## Troubleshooting
 
-- **OIDC login denied:** verify the NuGet user, repository owner, repository name, workflow file name and optional environment. The workflow must match an active NuGet trust policy.
+- **OIDC login denied:** verify the NuGet user, repository owner, repository name, workflow file name and `released` environment. The workflow must match an active NuGet trust policy.
+- **Environment mismatch (expected `released`, actual empty):** ensure the publish job declares `environment: released`. After pushing this fix to `master`, start a new manual run; retrying the failed historical run still uses its original workflow definition.
 - **No matching trust policy owned by user:** create the matching policy under the profile specified by `NuGet/login` or change `user` to the policy creator's NuGet profile. Updating an API-key secret does not fix a missing trust policy.
 - **Missing OIDC token permission:** ensure `id-token: write` is set on the publish job.
 - **Old API-key error after migration:** start a new manual release from `master`; retrying a historical workflow uses its original definition, not this workflow.
