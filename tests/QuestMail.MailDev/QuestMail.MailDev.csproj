@@ -10,4 +10,7 @@
         <PackageReference Include="MailKit" Version="4.18.2" />
         <ProjectReference Include="..\..\src\QuestMail.Core\QuestMail.Core.csproj" />
     </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="Templates\Assets\*.png" LogicalName="QuestMail.PreviewAssets.%(Filename)%(Extension)" />
+    </ItemGroup>
 </Project>

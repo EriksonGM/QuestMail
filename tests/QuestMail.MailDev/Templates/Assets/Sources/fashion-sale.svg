@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="1040" viewBox="0 0 720 1040">
+  <defs><linearGradient id="stone" x2="1" y2="1"><stop stop-color="#29251d"/><stop offset="1" stop-color="#68604c"/></linearGradient></defs>
+  <rect width="720" height="1040" fill="#171612"/>
+  <path d="M52 1040V347C52 40 668 40 668 347v693z" fill="url(#stone)"/>
+  <path d="M121 1040V352c0-224 478-224 478 0v688z" fill="#24221b" stroke="#867658" stroke-width="12"/>
+  <path d="M163 1040V364c0-182 394-182 394 0v676z" fill="#13140f" stroke="#655940" stroke-width="15"/>
+  <g fill="none" stroke="#867658" stroke-width="5" opacity=".6"><path d="M71 383h50m-50 49h50m-50 49h50m-50 49h50m-50 49h50m478-196h50m-50 49h50m-50 49h50m-50 49h50m-50 49h50"/><path d="m140 214-42-19m83-27-28-29m86 1-16-36m87 20-4-39m78 39 10-36m65 54 21-34m40 64 29-26m17 75 41-17"/></g>
+  <g fill="#ffffff" font-family="Georgia,serif" text-anchor="middle"><text x="360" y="340" font-size="178">80%</text><text x="360" y="470" font-size="156">OFF</text></g>
+  <text x="473" y="226" font-family="Arial,sans-serif" font-size="20" letter-spacing="6" fill="#ffffff">UP TO</text>
+  <g><path d="m328 770-31 182h41l25-144 30 144h42l-39-182z" fill="#b8a58b"/><path d="m324 658-32 120 44 25 24-58 25 59 42-24-35-120z" fill="#d5c4a5"/><path d="m320 675-19 101m92-101 28 99" stroke="#e2c2a5" stroke-width="16" stroke-linecap="round"/><ellipse cx="359" cy="626" rx="25" ry="34" fill="#d9ae8b"/><path d="M335 622c-5-43 54-46 51 3l-8 15-9-33-29 19z" fill="#35281d"/></g>
+  <g transform="rotate(-6 360 617)"><rect x="-10" y="588" width="740" height="49" fill="#f58b31"/><text x="360" y="620" text-anchor="middle" font-family="Arial,sans-serif" font-size="24" letter-spacing="7" fill="#ffffff">ONLINE WAREHOUSE SALE</text></g>
+  <path d="M0 1010h720v30H0z" fill="#8c8778"/>
+</svg>

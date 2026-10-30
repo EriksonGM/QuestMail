@@ -10,10 +10,10 @@ public class EmailTemplateTests
     {
         var templates = EmailTemplateCatalog.Discover();
 
-        Assert.True(templates.Count >= 5);
+        Assert.True(templates.Count >= 18);
         Assert.Equal(templates.Select(template => template.Name).Order(StringComparer.Ordinal), templates.Select(template => template.Name));
         Assert.Equal(templates.Count, templates.Select(template => template.Name).Distinct(StringComparer.OrdinalIgnoreCase).Count());
-        foreach (var name in new[] { "welcome", "password-reset", "order-confirmation", "newsletter", "security-alert" })
+        foreach (var name in new[] { "welcome", "password-reset", "order-confirmation", "newsletter", "security-alert", "custom-css" })
             Assert.Contains(templates, template => template.Name == name);
     }
 
@@ -33,7 +33,14 @@ public class EmailTemplateTests
             var alternatives = Assert.IsType<MultipartAlternative>(message.Body);
             Assert.Equal(2, alternatives.Count);
             Assert.Equal("text/plain", alternatives[0].ContentType.MimeType);
-            Assert.Equal("text/html", alternatives[1].ContentType.MimeType);
+            if (template.InlineImages.Count == 0)
+                Assert.Equal("text/html", alternatives[1].ContentType.MimeType);
+            else
+            {
+                var related = Assert.IsType<MultipartRelated>(alternatives[1]);
+                Assert.Equal("text/html", related[0].ContentType.MimeType);
+                Assert.Equal(template.InlineImages.Count + 1, related.Count);
+            }
             Assert.Equal(content.Html.ReplaceLineEndings("\n"), Assert.IsType<string>(message.HtmlBody).ReplaceLineEndings("\n"));
             Assert.Equal(content.Plain.ReplaceLineEndings("\n"), Assert.IsType<string>(message.TextBody).ReplaceLineEndings("\n"));
             Assert.Equal(settings.From, Assert.Single(message.From));

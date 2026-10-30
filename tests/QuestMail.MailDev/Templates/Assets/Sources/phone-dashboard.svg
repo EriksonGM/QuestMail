@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="680" height="440" viewBox="0 0 680 440">
+  <rect width="680" height="440" fill="#f7f9f8"/>
+  <ellipse cx="349" cy="420" rx="151" ry="13" fill="#e2e8e3"/>
+  <g transform="translate(182 35) rotate(-8 110 190)">
+    <rect width="218" height="393" rx="37" fill="#273e32"/>
+    <rect x="10" y="10" width="198" height="372" rx="29" fill="#ffffff"/>
+    <path d="M56 10h107v16c0 11-7 16-18 16H74c-12 0-18-7-18-16z" fill="#273e32"/>
+    <text x="28" y="88" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#1b2d23">Hello, Candy</text>
+    <text x="28" y="112" font-family="Arial,sans-serif" font-size="12" fill="#6f7e76">Your next chapter starts here.</text>
+    <rect x="25" y="135" width="168" height="96" rx="14" fill="#e5efdf"/>
+    <path d="m38 210 28-20 23 4 22-31 29 11 38-24" fill="none" stroke="#63884c" stroke-width="5"/>
+    <rect x="25" y="254" width="75" height="72" rx="10" fill="#faf1df"/><rect x="117" y="254" width="75" height="72" rx="10" fill="#eaf0fb"/>
+    <text x="38" y="283" font-family="Arial,sans-serif" font-size="12" fill="#69736b">Projects</text><text x="38" y="310" font-family="Arial,sans-serif" font-size="24" font-weight="700" fill="#273e32">12</text>
+    <path d="M78 360h60" stroke="#273e32" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <g transform="translate(412 80) rotate(11 55 155)"><rect width="112" height="314" rx="30" fill="#647561"/><circle cx="29" cy="34" r="14" fill="#182c24"/><circle cx="65" cy="34" r="14" fill="#182c24"/><circle cx="29" cy="71" r="14" fill="#182c24"/><circle cx="56" cy="169" r="24" fill="#8b9a86"/></g>
+</svg>

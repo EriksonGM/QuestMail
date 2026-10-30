@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="650" viewBox="0 0 720 650">
+  <rect width="720" height="650" fill="#efd8a5"/>
+  <circle cx="243" cy="202" r="90" fill="#ffb338"/>
+  <g stroke="#ed9b2c" stroke-width="11"><path d="M243 79V56m0 293v-23M120 202H96m294 0h-25M156 115l-17-17m209 209-17-17m-175 0-17 17m209-209-17 17"/></g>
+  <path d="m472 111 105 98-204-11z" fill="#f34d62"/><path d="m472 111 3 93-102-6z" fill="#ffffff"/><path d="m472 111 105 98-53-5z" fill="#2d78c1"/><path d="m472 111-38 196" stroke="#724e29" stroke-width="8"/>
+  <g transform="rotate(-6 360 350)" font-family="Arial,sans-serif" font-weight="900" text-anchor="middle">
+    <text x="360" y="343" font-size="96" fill="#177b78" stroke="#177b78" stroke-width="14" paint-order="stroke">SUMMER</text>
+    <text x="360" y="334" font-size="96" fill="#ffffff">SUMMER</text>
+    <text x="360" y="448" font-size="139" fill="#177b78" stroke="#177b78" stroke-width="16" paint-order="stroke">SALE</text>
+    <text x="360" y="438" font-size="139" fill="#ffffff">SALE</text>
+    <path d="M263 467h266v95H263z" fill="#e81d58"/>
+    <text x="394" y="502" font-size="24" fill="#ffffff">UP TO</text><text x="394" y="552" font-size="54" fill="#ffffff">10% OFF</text>
+  </g>
+  <path d="m93 404 18 12m487 20 20-7M160 486l-14 13" stroke="#ffbc43" stroke-width="8" stroke-linecap="round"/>
+</svg>
